@@ -419,7 +419,7 @@ class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListe
 		    if ("launchChrome".equals(action)) {
 		    	String path = "";
 		    	
-		    	File settings = new File("chromePath.txt");
+		    	File settings = new File("gauntlet-helper.txt");
 		    	if (settings.exists()) {
 		    		BufferedReader reader = new BufferedReader(new FileReader(settings));
 		    	    path = reader.readLine();
