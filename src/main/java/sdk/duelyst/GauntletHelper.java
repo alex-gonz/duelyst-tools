@@ -227,7 +227,7 @@ class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListe
         c.gridwidth = 2;
         add(lblCyno, c);
         
-        btnChrome = new JButton("Launch Duelyst");
+        btnChrome = new JButton("Launch Chrome");
         btnChrome.setActionCommand("launchChrome");
         btnChrome.addActionListener(this);
 
@@ -554,6 +554,7 @@ class OverlayPanel extends JPanel {
         window = new JWindow();
         window.setBackground(new Color(0, 0, 0, 0));
         window.setAlwaysOnTop(true);
+        window.getRootPane().putClientProperty("apple.awt.draggableWindowBackground", false);
 
         this.setBackground(new Color(0, 0, 0, 0));
         window.add(this);
