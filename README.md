@@ -5,7 +5,7 @@ Overlays CynosureGG's card ratings and notes when you pick cards for gauntlet. U
 http://i.imgur.com/8L490Zd.png
 
 ## Requirements ##
-- Java 7 - https://www.java.com/en/download/
+- Java 7 - https://www.java.com/download/
 - Chrome - https://www.google.com/chrome/browser/desktop/
 
 ## CynosureGG ##
