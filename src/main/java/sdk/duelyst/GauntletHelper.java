@@ -62,9 +62,9 @@ import net.sf.image4j.codec.ico.ICODecoder;
 import net.sf.image4j.codec.ico.ICOImage;
 import sdk.duelyst.console.DuelystConsole;
 import sdk.duelyst.console.DuelystConsoleListener;
-import sdk.duelyst.console.DuelystMessage;
-import sdk.duelyst.console.GauntletOptionsMessage;
-import sdk.duelyst.console.MessageType;
+import sdk.duelyst.console.message.DuelystMessage;
+import sdk.duelyst.console.message.GauntletOptionsMessage;
+import sdk.duelyst.console.message.MessageType;
 import sdk.utility.ChromeUtil;
 import sdk.utility.ChromeWsUrl;
 import sdk.utility.MapUtil;
@@ -314,7 +314,7 @@ class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListe
         frame.pack();
         
         frame.setMinimumSize(new Dimension(225, 0));
-        frame.setLocationRelativeTo(null);
+        // TODO: frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         
         frame.addWindowListener(new WindowAdapter() {
@@ -507,6 +507,8 @@ class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListe
 			updateEnables();
 			updateOverlayVisible();
 		}
+		
+		System.out.println(message);
 	}
 }
 
