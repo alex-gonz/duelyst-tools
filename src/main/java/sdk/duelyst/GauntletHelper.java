@@ -58,6 +58,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import com.neovisionaries.ws.client.WebSocketException;
+
 import net.sf.image4j.codec.ico.ICODecoder;
 import net.sf.image4j.codec.ico.ICOImage;
 import sdk.duelyst.console.DuelystConsole;
@@ -483,6 +485,11 @@ class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListe
 		    }
 		    
 		    updateEnables();
+		} catch (WebSocketException ex) {
+		    ex.printStackTrace();
+		    timer.cancel();
+			JOptionPane.showMessageDialog(this, "Error connecting to chrome: " + ex.getMessage() + System.lineSeparator()
+			+ "Program will have to be restarted to refresh correctly.");
 		} catch (Exception ex) {
 		    ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Error performing action " + action + ": " + ex.getMessage());
