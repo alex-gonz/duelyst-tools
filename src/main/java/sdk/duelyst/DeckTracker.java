@@ -1,181 +1,147 @@
 package sdk.duelyst;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JWindow;
-
+import sdk.duelyst.console.DuelystConsole;
 import sdk.duelyst.console.DuelystConsoleListener;
+import sdk.duelyst.console.message.CardDrawnMessage;
 import sdk.duelyst.console.message.CardPlayedMessage;
+import sdk.duelyst.console.message.CardReplacedMessage;
 import sdk.duelyst.console.message.DuelystMessage;
 import sdk.duelyst.console.message.GameStartedMessage;
+import sdk.duelyst.console.message.MessageType;
+import sdk.duelyst.console.message.StartingHandMessage;
+import sdk.duelyst.ui.DeckTrackerPanel;
 
 public class DeckTracker implements DuelystConsoleListener {
-	private Map<String, Player> players = new HashMap<String, Player>();
-	private Map<Player, DeckTrackerPanel> panels = new HashMap<Player, DeckTrackerPanel>();
+	private DeckTrackerPanel panel;
+	private Player player;
 	private CardPlayedMessage lastPlayed;
 	
-	public DeckTracker() {
-		
+	public DeckTracker() throws IOException {
+		panel = new DeckTrackerPanel();
+	}
+	
+	public void addListener(DuelystConsole console) {
+		console.addListener(this);
 	}
 
 	@Override
 	public void onMessage(DuelystMessage message) {
+		if (player == null && message.type != MessageType.GAME_START) {
+			return;
+		} else if (!message.playerId.equals("") && player != null && !message.playerId.equals(player.id)) {
+			return;
+		}
+		
+		System.out.println(message);
+		
 		switch (message.type)
 		{
-		case CANCEL:
-			cancelLastPlay(message);
-			break;
-		case CARD_DRAW:
-			break;
-		case CARD_PLAY:
-			break;
-		case CARD_REPLACE:
+		case GAUNTLET_OPTIONS:
+		case TURN_END:
 			break;
 		case EXIT:
+		case GAME_END:
+			reset();
+			break;
+		case CANCEL:
+			cancel(message);
+			break;
+		case CARD_DRAW:
+			cardDraw((CardDrawnMessage)message);
+			break;
+		case CARD_PLAY:
+			cardPlay((CardPlayedMessage)message);
+			break;
+		case CARD_REPLACE:
+			cardReplace((CardReplacedMessage)message);
+			break;
+		case DECK_UPDATE:
+			System.out.println(message.toString());
 			break;
 		case GAME_START:
 			gameStart((GameStartedMessage)message);
 			break;
-		case GAUNTLET_OPTIONS:
-			break;
 		case STARTING_HAND:
-			break;
-		case TURN_END:
+			startingHand((StartingHandMessage)message);
 			break;
 		}
 	}
 
-	private void cancelLastPlay(DuelystMessage message) {
+	public void setVisible(boolean visible) {
+		panel.setWindowVisible(visible);
+	}
+
+	public void setCompact(boolean compact) {
+		panel.setCompact(compact);
+	}
+
+	private void cancel(DuelystMessage message) {
 		if (lastPlayed != null) {
-			players.get(message.playerId).hand[lastPlayed.playedIndex] = lastPlayed.card;
+			player.hand[lastPlayed.playedIndex] = lastPlayed.card;
 			lastPlayed = null;
-			
-			update(message.playerId);
+			update();
 		}
 	}
 
-	private void gameStart(GameStartedMessage message) {
-		players.clear(); // TODO: destroy old panels, do this on exit
-		panels.clear();
-		lastPlayed = null;
+	private void cardDraw(CardDrawnMessage message) {
+		cardDraw(message.card);
+	}
+
+	private void cardDraw(Card card) {
+		player.deck.remove(card);
+		
+		for (int i = 0; i < player.hand.length; i++) {
+			if (player.hand[i] == null) {
+				player.hand[i] = card;
+				break;
+			}
+		}
 		
 		update();
 	}
+
+	private void cardPlay(CardPlayedMessage message) {
+		lastPlayed = message;
+		player.hand[message.playedIndex] = null;
+		update();
+	}
+
+	private void cardReplace(CardReplacedMessage message) {
+		player.deck.add(player.hand[message.replacedIndex]);
+		player.hand[message.replacedIndex] = null;
+		
+		// TODO Doesn't handle the case where there are no open spots on the field to place it
+		if (!message.card.name.equals("Dreamgazer")) {
+			player.deck.add(message.card);
+		}
+		
+		cardDraw(message.card);
+	}
+
+	private void gameStart(GameStartedMessage message) {
+		reset();
+		player = new Player(message.playerName, message.playerId, message.deck);
+		update();
+	}
+
+	private void startingHand(StartingHandMessage message) {
+		for (int i = 0; i < message.hand.size(); i++) {
+			player.deck.remove(message.hand.get(i));
+			player.hand[i] = message.hand.get(i);
+		}
+		
+		update();
+	}
+
+	private void reset() {
+		player = null;
+		lastPlayed = null;
+		panel.clear();
+	}
 	
 	private void update() {
-		for (Player player : panels.keySet()) {
-			panels.get(player).update(player);
-		}
-	}
-
-	private void update(String playerId) {
-		Player player = players.get(playerId);
-		panels.get(player).update(player);
-	}
-}
-
-class Player {
-	public final String name;
-	public final String id;
-	public final Card[] hand = new Card[6];
-	public final List<Card> deck = new ArrayList<Card>();
-	
-	public Player(String name, String id) {
-		this.name = name;
-		this.id = id;
-	}
-}
-
-class CardComparator implements Comparator<Card> {
-	@Override
-    public int compare(Card card1, Card card2) {
-        if (card1.manaCost == card2.manaCost) {
-        	return card1.name.compareTo(card2.name);
-        } else {
-        	return card1.manaCost - card2.manaCost;
-        }
-    }
-}
-
-class DeckTrackerPanel extends JPanel {
-	private static final long serialVersionUID = 452902188644703086L;
-	
-	private JWindow window;
-	private JTextPane txtPlayer, txtHand, txtDeck;
-	
-	public DeckTrackerPanel() {
-		super(null);
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-		txtPlayer = new JTextPane();
-		txtHand = new JTextPane();
-		txtDeck = new JTextPane();
-
-        add(txtPlayer);
-        add(txtHand);
-        add(txtDeck);
-        
-        window = new JWindow();
-        //window.setBackground(new Color(0, 0, 0, 0));
-        //window.setAlwaysOnTop(true);
-        //window.getRootPane().putClientProperty("apple.awt.draggableWindowBackground", false);
-
-        //this.setBackground(new Color(0, 0, 0, 0));
-        window.add(this);
-        
-        window.setSize(400, 800);
-        window.setLocationRelativeTo(null);
-	}
-	
-	public void update(Player player) {
-		Collections.sort(player.deck, new CardComparator());
-		
-		Map<Card, Integer> deckMap = new HashMap<Card, Integer>();
-		for (Card card : player.deck) {
-			int count = deckMap.containsKey(card) ? deckMap.get(card) : 0;
-			deckMap.put(card, count + 1);
-		}
-		
-		setPlayer(player.name);
-		setHand(player.hand);
-		setDeck(player.deck, deckMap);
-	}
-	
-	private void setPlayer(String name) {
-		txtPlayer.setText(name);
-	}
-	
-	private void setHand(Card[] hand) {
-		String handString = "";
-		for (Card card : hand) {
-			if (card != null) {
-				handString += card.name;
-			}
-			
-			handString += System.lineSeparator();
-		}
-		
-		txtHand.setText(handString.trim());
-	}
-	
-	private void setDeck(List<Card> deck, Map<Card, Integer> deckMap) {
-		String deckString = "";
-		for (Card card : deck) {
-			if (card != null) {
-				deckString += card.name + " x" + deckMap.get(card);
-			}
-			
-			deckString += System.lineSeparator();
-		}
-		
-		txtDeck.setText(deckString.trim());
+		panel.update(player);
 	}
 }
