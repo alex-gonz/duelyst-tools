@@ -31,8 +31,8 @@ public class DuelystTools implements Runnable {
 	public static void main(String[] args) {
 		try { 
 		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception ex) {
-		    ex.printStackTrace();
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
 		
 		// http://stackoverflow.com/questions/20269083/make-a-swing-thread-that-show-a-please-wait-jdialog
@@ -41,17 +41,17 @@ public class DuelystTools implements Runnable {
 	        protected Boolean doInBackground() {
 	        	try {
 	     			DuelystLibrary.load();
-	     		} catch (Exception ex) {
-	     		    ex.printStackTrace();
-	     			JOptionPane.showMessageDialog(null, "Error loading card library: " + ex.getMessage());
+	     		} catch (Exception e) {
+	     		    e.printStackTrace();
+	     			JOptionPane.showMessageDialog(null, "Error loading card library: " + e.getMessage());
 	     			return false;
 	     		}
 	     		
 	     		try {
 	     			GauntletDataCyno.load();
-	     		} catch (Exception ex) {
-	     		    ex.printStackTrace();
-	     			JOptionPane.showMessageDialog(null, "Error loading gauntlet ratings: " + ex.getMessage());
+	     		} catch (Exception e) {
+	     		    e.printStackTrace();
+	     			JOptionPane.showMessageDialog(null, "Error loading gauntlet ratings: " + e.getMessage());
 	     			return false;
 	     		}
 	     		
@@ -76,8 +76,8 @@ public class DuelystTools implements Runnable {
 	    dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	    try {
 	        dialog.setIconImage(getIcon());
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	    
 		JPanel panel = new JPanel(new GridLayout(2, 1, 3, 3));
@@ -108,7 +108,8 @@ public class DuelystTools implements Runnable {
         try {
 			new ControlPanel();
 		} catch (IOException e) {
-			e.printStackTrace(); // TODO
+			JOptionPane.showMessageDialog(null, "Error creating GUI: " + e.getMessage());
+			System.exit(1);
 		}
     }
 

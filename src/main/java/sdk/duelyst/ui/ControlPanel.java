@@ -65,6 +65,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	private DuelystConsole duelyst;
 	private GauntletOptionsMessage lastGauntletOptions;
 	
+	private JFrame frame;	
 	private JButton btnChrome, btnConnect;
 	private JComboBox<String> cmbTabs, cmbFactions;
 	private JCheckBox chkShowTracker, chkCompactTracker, chkShowOverlay;
@@ -234,7 +235,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         	add(lblFaction, c);
         }
         
-        JFrame frame = new JFrame();
+        frame = new JFrame();
         frame.setTitle("Duelyst Tools");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setAlwaysOnTop(true);
@@ -242,12 +243,19 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         
 		try {
 	        frame.setIconImage(DuelystTools.getIcon());
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
         
         frame.add(this);
         frame.pack();
+
+        overlay = new GauntletOverlayPanel();
+        try {
+	        tracker = new DeckTracker();
+        } catch (IOException e) {
+        	throw e;
+        }
         
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -269,9 +277,6 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         
         cmbFactions.setSelectedIndex(0);
         
-        overlay = new GauntletOverlayPanel();
-        tracker = new DeckTracker();
-        
         timer.schedule(new TimerTask() {
         	@Override
         	public void run() {
@@ -279,6 +284,10 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         	}
         }, 1000, 1000);
     }
+	
+	public void close() {
+		frame.dispose();
+	}
 	
 	private void updateEnables() {
 		btnChrome.setEnabled(!isConnected() && wsUrls.isEmpty());
@@ -328,10 +337,10 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 							i--;
 						}
 					}
-				} catch (ConnectException ex) {
+				} catch (ConnectException e) {
 					cmbTabs.removeAllItems();
-				} catch (Exception ex) {
-					ex.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			    
 			    updateEnables();
@@ -393,7 +402,6 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 				    	selectedWsUrl = wsUrls.get(cmbTabs.getSelectedIndex());
 		    		} else {
 		    			// Handle weirdness when removing the selected item, have to set the selectedWsUrl because this doesn't seem to fire any event
-		    			// TODO This may still not work in cases with a lot of tabs, but we'll see
 		    			int selectedIndex = wsUrls.size() > 0 ? wsUrls.size() - 1 : -1;
 		    			cmbTabs.setSelectedIndex(selectedIndex);
 		    			
@@ -434,14 +442,14 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		    }
 		    
 		    updateEnables();
-		} catch (WebSocketException ex) {
-		    ex.printStackTrace();
+		} catch (WebSocketException e) {
+		    e.printStackTrace();
 		    timer.cancel();
-			JOptionPane.showMessageDialog(this, "Error connecting to chrome: " + ex.getMessage() + System.lineSeparator()
+			JOptionPane.showMessageDialog(this, "Error connecting to chrome: " + e.getMessage() + System.lineSeparator()
 			+ "Program will have to be restarted to refresh correctly.");
-		} catch (Exception ex) {
-		    ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Error performing action " + action + ": " + ex.getMessage());
+		} catch (Exception e) {
+		    e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Error performing action " + action + ": " + e.getMessage());
 		}
 	}
 	
