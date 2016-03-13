@@ -12,14 +12,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URI;
@@ -61,6 +57,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	private static final long serialVersionUID = -7966114779784215280L;
 	
 	private Properties properties = new Properties();
+	private String chromePath = "";
 	
 	private Timer timer = new Timer();
 	
@@ -310,6 +307,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 			try (FileInputStream stream = new FileInputStream(propFile)) {
 				properties.load(stream);
 				
+				chromePath = properties.getProperty("chrome-path");
 				chkShowTracker.setSelected(Boolean.parseBoolean(properties.getProperty("tracker-shown")));
 				chkExpandTracker.setSelected(Boolean.parseBoolean(properties.getProperty("tracker-expand")));
 				
@@ -322,6 +320,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	private void saveProperties() throws URISyntaxException, IOException {
 		File propFile = getPropFile();
 		try (FileOutputStream stream = new FileOutputStream(propFile)) {
+			properties.setProperty("chrome-path", chromePath);
 			properties.setProperty("tracker-shown", Boolean.toString(chkShowTracker.isSelected()));
 			properties.setProperty("tracker-expand", Boolean.toString(chkExpandTracker.isSelected()));
 			
@@ -330,8 +329,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	}
 
 	private File getPropFile() throws URISyntaxException {
-		File dirFile = new File(ControlPanel.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-		return new File(dirFile, "config.properties");
+		return new File(System.getProperty("user.dir"), "config.properties");
 	}
 	
 	private void updateEnables() {
@@ -382,6 +380,8 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 							i--;
 						}
 					}
+					
+					frame.pack();
 				} catch (ConnectException e) {
 					cmbTabs.removeAllItems();
 				} catch (Exception e) {
@@ -415,30 +415,18 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	private void onAction(String action) {
 		try {
 		    if ("launchChrome".equals(action)) {
-		    	String path = "";
+		    	chromePath = ChromeUtil.getChromePath(chromePath);
 		    	
-		    	File settings = new File("duelyst-tools.txt");
-		    	if (settings.exists()) {
-		    		BufferedReader reader = new BufferedReader(new FileReader(settings));
-		    	    path = reader.readLine();
-		    	    reader.close();
-		    	}
-		    	
-		    	path = ChromeUtil.getChromePath(path);
-		    	
-		    	if (path.equals("")) {
+		    	if (chromePath.equals("")) {
 		    		JFileChooser chooser = new JFileChooser();
 		    		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-		    			path = chooser.getSelectedFile().getAbsolutePath();
+		    			chromePath = chooser.getSelectedFile().getAbsolutePath();
 		    		}
 		    	}
 		    	
-		    	if (!path.equals("")) {
-		    		BufferedWriter writer = new BufferedWriter(new FileWriter(settings));
-		    	    writer.write(path);
-		    	    writer.close();
-		    		
-			    	DuelystConsole.launchDebug(path);
+		    	if (!chromePath.equals("")) {
+		    		saveProperties();
+			    	DuelystConsole.launchDebug(chromePath);
 		    	}
 		    }
 		    else if ("tabSelected".equals(action)) {

@@ -13,5 +13,5 @@ hs_err_pid*
 
 target/
 .settings/
-
-gauntlet-helper.txt
+duelyst-profile/
+config.properties
