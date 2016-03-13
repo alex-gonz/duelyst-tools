@@ -15,6 +15,9 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,6 +27,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +60,8 @@ import com.neovisionaries.ws.client.WebSocketException;
 public class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListener {
 	private static final long serialVersionUID = -7966114779784215280L;
 	
+	private Properties properties = new Properties();
+	
 	private Timer timer = new Timer();
 	
 	private List<ChromeWsUrl> wsUrls = new ArrayList<ChromeWsUrl>();
@@ -68,7 +74,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	private JFrame frame;	
 	private JButton btnChrome, btnConnect;
 	private JComboBox<String> cmbTabs, cmbFactions;
-	private JCheckBox chkShowTracker, chkCompactTracker, chkShowOverlay;
+	private JCheckBox chkShowTracker, chkExpandTracker, chkShowOverlay;
 	private JLabel lblGauntlet, lblTracker;
 	private JSeparator sepGauntlet, sepTracker;
 	
@@ -77,6 +83,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 
 	public ControlPanel() throws IOException {
         super(new GridBagLayout());
+        
         setBorder(new EmptyBorder(3, 3, 0, 3));
         
         GridBagConstraints c = new GridBagConstraints();
@@ -137,14 +144,14 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         c.gridy++;
         add(chkShowTracker, c);
         
-        chkCompactTracker = new JCheckBox("Compact");
-        chkCompactTracker.setActionCommand("compactTracker");
-        chkCompactTracker.addActionListener(this);
-        chkCompactTracker.setEnabled(false);
+        chkExpandTracker = new JCheckBox("Expanded");
+        chkExpandTracker.setActionCommand("expandTracker");
+        chkExpandTracker.addActionListener(this);
+        chkExpandTracker.setEnabled(false);
 
         c.gridx = 2;
         c.gridwidth = 1;
-        add(chkCompactTracker, c);
+        add(chkExpandTracker, c);
         
         lblGauntlet = new JLabel("Gauntlet Helper");
         
@@ -283,10 +290,48 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
         		refreshTabs();
         	}
         }, 1000, 1000);
+        
+        try {
+			loadProperties();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
     }
-	
+
 	public void close() {
 		frame.dispose();
+	}
+	
+	private void loadProperties() throws FileNotFoundException, IOException, URISyntaxException {
+		File propFile = getPropFile();
+		if (!propFile.exists()) {
+			saveProperties();
+		} else {
+			try (FileInputStream stream = new FileInputStream(propFile)) {
+				properties.load(stream);
+				
+				chkShowTracker.setSelected(Boolean.parseBoolean(properties.getProperty("tracker-shown")));
+				chkExpandTracker.setSelected(Boolean.parseBoolean(properties.getProperty("tracker-expand")));
+				
+				onAction("showTracker");
+				onAction("expandTracker");
+			}
+		}
+	}
+	
+	private void saveProperties() throws URISyntaxException, IOException {
+		File propFile = getPropFile();
+		try (FileOutputStream stream = new FileOutputStream(propFile)) {
+			properties.setProperty("tracker-shown", Boolean.toString(chkShowTracker.isSelected()));
+			properties.setProperty("tracker-expand", Boolean.toString(chkExpandTracker.isSelected()));
+			
+			properties.store(stream, null);
+		}
+	}
+
+	private File getPropFile() throws URISyntaxException {
+		File dirFile = new File(ControlPanel.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+		return new File(dirFile, "config.properties");
 	}
 	
 	private void updateEnables() {
@@ -295,7 +340,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		btnConnect.setEnabled(!isConnected() && !wsUrls.isEmpty() && selectedWsUrl != null);
 		
 		chkShowTracker.setEnabled(isConnected());
-		chkCompactTracker.setEnabled(isConnected());
+		chkExpandTracker.setEnabled(isConnected());
 		
 		cmbFactions.setEnabled(isConnected());
 		chkShowOverlay.setEnabled(isConnected());
@@ -433,9 +478,11 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		    }
 		    else if ("showTracker".equals(action)) {
 			    updateTrackerVisible();
+			    saveProperties();
 		    }
-		    else if ("compactTracker".equals(action)) {
-			    tracker.setCompact(chkCompactTracker.isSelected());
+		    else if ("expandTracker".equals(action)) {
+			    tracker.setCompact(!chkExpandTracker.isSelected());
+			    saveProperties();
 		    }
 		    else if ("showOverlay".equals(action)) {
 			    updateOverlayVisible();

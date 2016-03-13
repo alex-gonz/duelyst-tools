@@ -248,7 +248,7 @@ class PlayerPanel extends DraggablePanel {
 				g.drawImage(imgFaction, MARGIN_LEFT, (getHeight() - imgFaction.getHeight()) / 2, this);
 			}
 			
-			drawString(g, player.name, new Font("default", Font.BOLD, 24), Color.WHITE, new Rectangle(0, 0, getWidth() - MARGIN_RIGHT, getHeight()), true);
+			drawString(g, player.name, new Font("default", Font.BOLD, 20), Color.WHITE, new Rectangle(0, 0, getWidth() - MARGIN_RIGHT, getHeight()), true);
 		}
 	}
 }
@@ -281,7 +281,7 @@ class CardPanel extends DraggablePanel {
     
     private Rectangle bndName, bndMana, bndAtk, bndHp;
     private BufferedImage imgIcon;
-    private boolean compact;
+    private boolean compact = true;
     
     private Card card = null;
     private int count = 1;
@@ -298,8 +298,8 @@ class CardPanel extends DraggablePanel {
 		
 		bndName = new Rectangle(0, 0, getWidth() - imgMana.getWidth() - MARGIN, imgMana.getHeight());
 		bndMana = new Rectangle(getWidth() - imgMana.getWidth(), 0, imgMana.getWidth(), imgMana.getHeight());
-		bndAtk = new Rectangle(getWidth() - (imgAtk.getWidth() + imgHp.getWidth()), getHeight() - imgAtk.getHeight(), imgAtk.getWidth(), imgAtk.getHeight());
-		bndHp = new Rectangle(getWidth() - imgHp.getWidth(), getHeight() - imgHp.getHeight(), imgHp.getWidth(), imgHp.getHeight());
+		bndAtk = new Rectangle(getWidth() - (imgAtk.getWidth() + imgHp.getWidth()), HEIGHT - imgAtk.getHeight(), imgAtk.getWidth(), imgAtk.getHeight());
+		bndHp = new Rectangle(getWidth() - imgHp.getWidth(), HEIGHT - imgHp.getHeight(), imgHp.getWidth(), imgHp.getHeight());
 	}
 	
 	public void setCompact(boolean compact) {
