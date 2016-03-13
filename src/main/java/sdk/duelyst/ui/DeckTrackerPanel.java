@@ -63,12 +63,7 @@ public class DeckTrackerPanel extends JPanel {
 
         this.setBackground(new Color(0, 0, 0, 0));
         window.add(this);
-
-		for (int i = 0; i < 13; i++) {
-			cardPanels[i].setVisible(true);
-		}
 		window.pack();
-		
         window.setLocationRelativeTo(null);
 	}
 
@@ -225,10 +220,10 @@ class PlayerPanel extends DraggablePanel {
 		
 		// Not the end of the world is this fails, too annoying to handle it
 		try {
-			if (player == null || player.generalCardId == -1) {
+			if (player == null || player.generalId == -1) {
 				imgFaction = null;
 			} else {
-				imgFaction = getImage(player.generalCardId + "_idle.png");
+				imgFaction = getImage(player.generalId + "_idle.png");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

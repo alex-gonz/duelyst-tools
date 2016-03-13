@@ -7,6 +7,7 @@ import sdk.duelyst.console.DuelystConsoleListener;
 import sdk.duelyst.console.message.DeckUpdateMessage;
 import sdk.duelyst.console.message.DuelystMessage;
 import sdk.duelyst.console.message.GameStartedMessage;
+import sdk.duelyst.console.message.JoinedGameMessage;
 import sdk.duelyst.console.message.MessageType;
 import sdk.duelyst.ui.DeckTrackerPanel;
 
@@ -32,7 +33,7 @@ public class DeckTracker implements DuelystConsoleListener {
 
 	@Override
 	public void onMessage(DuelystMessage message) {
-		if (player == null && message.type != MessageType.GAME_START) {
+		if (player == null && message.type != MessageType.GAME_START && message.type != MessageType.JOINED_GAME) {
 			return;
 		} else if (!message.playerId.equals("") && player != null && !message.playerId.equals(player.id)) {
 			return;
@@ -43,25 +44,31 @@ public class DeckTracker implements DuelystConsoleListener {
 		case GAME_START:
 			gameStart((GameStartedMessage)message);
 			break;
+		case JOINED_GAME:
+			joinedGame((JoinedGameMessage)message);
+			break;
 		case DECK_UPDATE:
 			deckUpdate((DeckUpdateMessage)message);
-			break;
-		case EXIT:
-		case GAME_END:
-			reset();
 			break;
 		default:
 			break;
 		}
 	}
-
+	
 	private void gameStart(GameStartedMessage message) {
 		reset();
-		player = new Player(message.playerName, message.playerId, message.deck);
+		player = new Player(message.playerId, message.playerName, message.deck);
+		update();
+	}
+
+	private void joinedGame(JoinedGameMessage message) {
+		reset();
+		player = new Player(message.playerId, message.generalId);
 		update();
 	}
 
 	private void deckUpdate(DeckUpdateMessage message) {
+		player.name = message.playerName;
 		player.updateDeck(message.deck);
 		update();
 	}
