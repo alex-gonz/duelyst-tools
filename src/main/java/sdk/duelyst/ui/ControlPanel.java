@@ -329,7 +329,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	}
 
 	private File getPropFile() throws URISyntaxException {
-		return new File(System.getProperty("user.dir"), "config.properties");
+		return new File(System.getProperty("user.dir"), "duelyst-tools.properties");
 	}
 	
 	private void updateEnables() {
