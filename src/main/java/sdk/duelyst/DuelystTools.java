@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -115,9 +116,7 @@ public class DuelystTools implements Runnable {
 
     // Bunch of BS to set an icon
 	public static Image getIcon() throws IOException {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream input = classLoader.getResourceAsStream("icon.ico");
-		List<ICOImage> images = ICODecoder.readExt(input);
+		List<ICOImage> images = ICODecoder.readExt(new File("images/icon.ico"));
 		return images.get(4).getImage(); // Second smallest, looks alright in both window and taskbar
 	}
 }

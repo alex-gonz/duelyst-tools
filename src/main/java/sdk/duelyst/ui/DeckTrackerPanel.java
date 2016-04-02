@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -140,9 +141,7 @@ class DraggablePanel extends JPanel {
 	public static final int HEIGHT = 48;
     
     protected static BufferedImage getImage(String fileName) throws IOException {
-    	ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		InputStream input = classLoader.getResourceAsStream(fileName);
-		return ImageIO.read(input);
+		return ImageIO.read(new File("images/" + fileName));
     }
 	
 	private final Component parent;
