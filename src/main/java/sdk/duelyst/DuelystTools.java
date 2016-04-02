@@ -11,6 +11,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,7 +30,8 @@ import net.sf.image4j.codec.ico.ICODecoder;
 import net.sf.image4j.codec.ico.ICOImage;
 
 public class DuelystTools implements Runnable {
-	
+	public static Path imageFolder = Paths.get("images");
+
 	public static void main(String[] args) {
 		try { 
 		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -41,7 +44,7 @@ public class DuelystTools implements Runnable {
 			@Override
 	        protected Boolean doInBackground() {
 	        	try {
-	     			DuelystLibrary.load();
+	     			DuelystLibrary.load(imageFolder);
 	     		} catch (Exception e) {
 	     		    e.printStackTrace();
 	     			JOptionPane.showMessageDialog(null, "Error loading card library: " + e.getMessage());
@@ -116,7 +119,7 @@ public class DuelystTools implements Runnable {
 
     // Bunch of BS to set an icon
 	public static Image getIcon() throws IOException {
-		List<ICOImage> images = ICODecoder.readExt(new File("images/icon.ico"));
+		List<ICOImage> images = ICODecoder.readExt(imageFolder.resolve("icon.ico").toFile());
 		return images.get(4).getImage(); // Second smallest, looks alright in both window and taskbar
 	}
 }

@@ -32,6 +32,7 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 
 import sdk.duelyst.Card;
+import sdk.duelyst.DuelystTools;
 import sdk.duelyst.Player;
 import sdk.duelyst.console.DuelystConsole;
 
@@ -141,7 +142,7 @@ class DraggablePanel extends JPanel {
 	public static final int HEIGHT = 48;
     
     protected static BufferedImage getImage(String fileName) throws IOException {
-		return ImageIO.read(new File("images/" + fileName));
+		return ImageIO.read(DuelystTools.imageFolder.resolve(fileName).toFile());
     }
 	
 	private final Component parent;
