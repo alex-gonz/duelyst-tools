@@ -1,6 +1,13 @@
 # duelyst-tools
 Deck tracker and gauntlet overlay (overlays CynosureGG's card ratings and notes when you pick cards for gauntlet).
 
+## Running this ##
+1. Clone this repo and duelyst-utils (https://github.com/alex-gonz/duelyst-utils)
+2. Install maven if you don't already have it.
+3. In the directory of duelyst-utils, run "maven install" to add it to your local library.
+4. In the directory of duelyst-tools, run "maven compile" to download all your dependencies.
+5. Run class DuelystTools with your preferred IDE.
+
 ## Screenshots ##
 http://imgur.com/a/V12hC
 
@@ -18,3 +25,4 @@ Gauntlet Tier List: https://docs.google.com/document/d/1JKJ5fjvwhchefhJcrQDOgRIw
 
 ## duelyst-utils ##
 https://github.com/ScottyDoesKnow/duelyst-utils
+
