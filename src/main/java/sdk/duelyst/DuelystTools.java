@@ -11,6 +11,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -38,7 +40,14 @@ public class DuelystTools implements Runnable {
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}
-		
+
+		try {
+			Files.createDirectory(imageFolder);
+		} catch (FileAlreadyExistsException ignored) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		// http://stackoverflow.com/questions/20269083/make-a-swing-thread-that-show-a-please-wait-jdialog
 		SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 			@Override
