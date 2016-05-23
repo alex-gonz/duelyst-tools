@@ -141,9 +141,9 @@ class DraggablePanel extends JPanel {
 	public static final int WIDTH = 224;
 	public static final int HEIGHT = 48;
     
-    protected static BufferedImage getImage(String fileName) throws IOException {
+	protected static BufferedImage getImage(String fileName) throws IOException {
 		return ImageIO.read(DuelystTools.imageFolder.resolve(fileName).toFile());
-    }
+	}
 	
 	private final Component parent;
     private final Point offset = new Point();
@@ -261,7 +261,7 @@ class CardPanel extends DraggablePanel {
     private static final int MANA_SIZE = 28;
     private static final int ATK_HP_SIZE = 24;
     private static final int MARGIN = 4;
-    private static final int MINION_SHIFT = -16;
+    private static final int MINION_SHIFT = 0;
 	
     private static BufferedImage imgBackground, imgMana, imgAtk, imgHp;
     private static Font font = new Font("default", Font.BOLD, 12);
