@@ -16,3 +16,6 @@ target/
 duelyst-profile/
 duelyst-tools.properties
 images/
+tessdata/
+screenshot*.png
+subscreenshot-of-first-option.png
