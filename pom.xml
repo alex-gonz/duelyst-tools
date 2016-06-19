@@ -4,8 +4,8 @@
   <artifactId>gauntlet-helper-chrome</artifactId>
   <version>0.1.0-beta</version>
   <properties>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <dependencies>
     <dependency>
@@ -37,6 +37,16 @@
 	  <groupId>org.imgscalr</groupId>
 	  <artifactId>imgscalr-lib</artifactId>
 	  <version>4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.tess4j</groupId>
+      <artifactId>tess4j</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
     </dependency>
   </dependencies>
 </project>
