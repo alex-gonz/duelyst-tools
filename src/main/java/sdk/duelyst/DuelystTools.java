@@ -2,6 +2,8 @@ package sdk.duelyst;
 
 import net.sf.image4j.codec.ico.ICODecoder;
 import net.sf.image4j.codec.ico.ICOImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.ui.ControlPanel;
 
 import javax.swing.*;
@@ -23,18 +25,20 @@ public class DuelystTools implements Runnable {
 	public static Path imageFolder = Paths.get("images");
 	public static Map<Faction, Map<Integer, Collection<Rating>>> ratings;
 
+	private static final Logger logger = LoggerFactory.getLogger(DuelystTools.class);
+
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 
 		try {
 			Files.createDirectory(imageFolder);
 		} catch (FileAlreadyExistsException ignored) {
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 
 		// http://stackoverflow.com/questions/20269083/make-a-swing-thread-that-show-a-please-wait-jdialog
@@ -44,7 +48,7 @@ public class DuelystTools implements Runnable {
 				try {
 					DuelystLibrary.load(imageFolder);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.toString());
 					JOptionPane.showMessageDialog(null, "Error loading card library: " + e.getMessage());
 					return false;
 				}
@@ -52,7 +56,7 @@ public class DuelystTools implements Runnable {
 				try {
 					ratings = GauntletDataZelda.load(DuelystLibrary.cardsById.values());
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.toString());
 					JOptionPane.showMessageDialog(null, "Error loading gauntlet ratings: " + e.getMessage());
 					return false;
 				}
@@ -79,7 +83,7 @@ public class DuelystTools implements Runnable {
 		try {
 			dialog.setIconImage(getIcon());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 
 		JPanel panel = new JPanel(new GridLayout(2, 1, 3, 3));
@@ -98,10 +102,8 @@ public class DuelystTools implements Runnable {
 			if (worker.get()) {
 				EventQueue.invokeLater(new DuelystTools());
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+		} catch (InterruptedException | ExecutionException e) {
+			logger.error(e.toString());
 		}
 	}
 

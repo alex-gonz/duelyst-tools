@@ -1,5 +1,8 @@
 package sdk.duelyst;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,13 +15,15 @@ public class GauntletDataZelda {
   public static final String GOOGLE_DOCS_URL_STRING = "https://docs.google.com/document/d/1r3tX0myAjXHo-EzGmQ2v3E-P2fLCB-8lcCdKkRzeQq0";
   public static final String DEFAULT_TEXT_URL_STRING = "https://docs.google.com/document/export?format=txt&id=1r3tX0myAjXHo-EzGmQ2v3E-P2fLCB-8lcCdKkRzeQq0";
 
+  private static final Logger logger = LoggerFactory.getLogger(GauntletDataZelda.class);
+
   public static Map<Faction, Map<Integer, Collection<Rating>>> load(Collection<Card> cards) throws IOException {
     try {
       URL defaultUrl = new URL(DEFAULT_TEXT_URL_STRING);
       return load(cards, defaultUrl);
     } catch (MalformedURLException e) {
-      e.printStackTrace();
-      throw new RuntimeException("Malformed default url: " + DEFAULT_TEXT_URL_STRING);
+      logger.error("Malformed default url: {} had error: {}", DEFAULT_TEXT_URL_STRING, e);
+      throw e;
     }
   }
 
@@ -39,6 +44,7 @@ public class GauntletDataZelda {
 
       for (Card general: generalCards) {
         if (line.toLowerCase().startsWith(general.name.toLowerCase())) {
+          logger.debug("Found general: {} on line: {}", general.name, line);
           maybeCurrentFaction = general.faction;
           factionToCardIdToRatings.put(general.faction, new HashMap<>());
           break;
@@ -65,11 +71,11 @@ public class GauntletDataZelda {
               ratingsList.add(new Rating(score, note));
               currentFactionMap.put(maybeCard.id, ratingsList);
             } catch (NumberFormatException e) {
-              e.printStackTrace();
+              logger.error(e.toString());
               throw e;
             }
           } else {
-            System.out.println("Line wasn't matched but had brackets: \"" + line + "\"");
+            logger.error("Line wasn't matched but had brackets: \"{}\"", line);
           }
         }
       }

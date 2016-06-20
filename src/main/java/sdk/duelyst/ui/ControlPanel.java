@@ -33,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.*;
 import sdk.duelyst.console.DuelystConsole;
 import sdk.duelyst.console.DuelystConsoleListener;
@@ -69,6 +71,8 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 
 	private GauntletOverlayPanel overlay;
 	private DeckTracker tracker;
+
+	private final Logger logger = LoggerFactory.getLogger(ControlPanel.class);
 
 	public ControlPanel(Map<Faction, Map<Integer, Collection<Rating>>> ratings) throws IOException {
 		super(new GridBagLayout());
@@ -173,10 +177,8 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 						try {
 							URI uri = new URI(GauntletDataZelda.GOOGLE_DOCS_URL_STRING);
 							desktop.browse(uri);
-						} catch (IOException ex) {
-							ex.printStackTrace();
-						} catch (URISyntaxException ex) {
-							ex.printStackTrace();
+						} catch (IOException | URISyntaxException ex) {
+							logger.error(ex.toString());
 						}
 					}
 				}
@@ -227,7 +229,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		try {
 			frame.setIconImage(DuelystTools.getIcon());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 
 		frame.add(this);
@@ -270,7 +272,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		try {
 			loadProperties();
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 	}
 
@@ -364,7 +366,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 				} catch (ConnectException e) {
 					cmbTabs.removeAllItems();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.toString());
 				}
 
 				updateEnables();
@@ -457,12 +459,12 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 
 			updateEnables();
 		} catch (WebSocketException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 			timer.cancel();
 			JOptionPane.showMessageDialog(this, "Error connecting to chrome: " + e.getMessage() + System.lineSeparator()
 							+ "Program will have to be restarted to refresh correctly.");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 			JOptionPane.showMessageDialog(this, "Error performing action " + action + ": " + e.getMessage());
 		}
 	}

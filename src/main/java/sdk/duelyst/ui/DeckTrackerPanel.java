@@ -31,6 +31,8 @@ import javax.swing.JWindow;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.Card;
 import sdk.duelyst.DuelystTools;
 import sdk.duelyst.Player;
@@ -44,7 +46,7 @@ public class DeckTrackerPanel extends JPanel {
     private final CardPanel[] cardPanels = new CardPanel[DuelystConsole.DECK_SIZE];
 	
 	public boolean empty = true;
-	
+
 	public DeckTrackerPanel() throws IOException {
 		super(null);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -140,7 +142,9 @@ class DraggablePanel extends JPanel {
 	
 	public static final int WIDTH = 224;
 	public static final int HEIGHT = 48;
-    
+
+	static final Logger logger = LoggerFactory.getLogger(DraggablePanel.class);
+
 	protected static BufferedImage getImage(String fileName) throws IOException {
 		return ImageIO.read(DuelystTools.imageFolder.resolve(fileName).toFile());
 	}
@@ -226,7 +230,7 @@ class PlayerPanel extends DraggablePanel {
 				imgFaction = getImage(player.generalId + "_idle.png");
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 
 		repaint();
@@ -316,7 +320,7 @@ class CardPanel extends DraggablePanel {
 		try {
 			imgIcon = card == null ? null : getImage(card.id + "_idle.png");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		
 		repaint();

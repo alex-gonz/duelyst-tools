@@ -1,5 +1,8 @@
 package sdk.utility;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +16,8 @@ public class OcrConfig {
 
   private static final Properties cachedProperties = new Properties();
   private static final String FILE_NAME = "ocr.properties";
+
+  private static final Logger logger = LoggerFactory.getLogger(OcrConfig.class);
 
   public static Collection<OcrDimensions> getDimensions() {
     if (cachedDimensions == null) {
@@ -35,8 +40,7 @@ public class OcrConfig {
       try (FileInputStream stream = new FileInputStream(getPropFile())) {
         cachedProperties.load(stream);
       } catch (IOException | URISyntaxException e) {
-        System.out.println("Error trying to load properties file, " + FILE_NAME);
-        e.printStackTrace();
+        logger.error("Error trying to load properties file: {} with stack trace {}", FILE_NAME, e.getStackTrace());
       }
     }
 

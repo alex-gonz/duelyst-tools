@@ -3,6 +3,8 @@ package sdk.utility;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.DuelystLibrary;
 
 import javax.imageio.ImageIO;
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class GauntletOcrUtil {
   private static Tesseract ocr = new Tesseract();
 
+  private static Logger logger = LoggerFactory.getLogger(GauntletOcrUtil.class);
+
   /**
    * Uses Tesseract to retrieve the Gauntlet choices
    * @param img A screenshot of chrome taken by the Chrome debugging protocol
@@ -29,7 +33,7 @@ public class GauntletOcrUtil {
 
     OcrDimensions dimensions;
     if (!maybeDimensions.isPresent()) {
-      System.out.println("No dimensions parsed from file. Check that it has proper syntax and restart this app.");
+      logger.error("No dimensions parsed from file. Check that it has proper syntax and restart this app.");
       return Optional.empty();
     } else {
       dimensions = maybeDimensions.get();
@@ -49,7 +53,7 @@ public class GauntletOcrUtil {
     try {
       ImageIO.write(img.getSubimage((int)firstRectangle.getX(), top, dimensions.getTextWidth(), dimensions.getTextHeight()), "png", outfile);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error(e.toString());
     }
 
     return getOcrNameToCard(img, firstRectangle).flatMap(first ->
@@ -83,7 +87,7 @@ public class GauntletOcrUtil {
     try {
       maybeOcrName = Optional.of(ocr.doOCR(img, firstRectangle));
     } catch (TesseractException e) {
-      e.printStackTrace();
+      logger.error("Error while doing ocr: {}", e);
     }
     return maybeOcrName.flatMap(GauntletOcrUtil::findOcrNameToCard).filter(OcrNameToCard::isValid);
   }
@@ -128,7 +132,7 @@ public class GauntletOcrUtil {
     if (largestSmallerThanImage.isPresent()) {
       return largestSmallerThanImage;
     } else {
-      System.out.println("Couldn't find a dimension smaller than current screen size. Returning smallest one.");
+      logger.info("Couldn't find a dimension smaller than current screen size. Using smallest configured one.");
       return dimensions.stream()
               .min((d1, d2) -> Integer.compare(d1.getScreenBaseWidth(), d2.getScreenBaseWidth()));
     }

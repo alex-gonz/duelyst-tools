@@ -12,6 +12,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.console.DuelystMessageState;
 import sdk.duelyst.console.message.MessageType;
 
@@ -37,6 +39,8 @@ public class ChromeUtil {
 	private static final String CHROMIUM_LINUX_PATH = "/usr/bin/chromium-browser";
 	
 	private static final List<String> CHROME_WIN_PATHS = new ArrayList<String>();
+
+	private static final Logger logger = LoggerFactory.getLogger(ChromeUtil.class);
 	
 	static {
 		CHROME_WIN_PATHS.add("%ProgramFiles%\\Google\\Chrome\\Application\\chrome.exe");
@@ -143,7 +147,7 @@ public class ChromeUtil {
 	private static void sendText(WebSocket webSocket, int callbackId, DuelystMessageState tag, String text) {
 		callbacks.put(callbackId, tag);
 		msgId++;
-		System.out.println("Sending message id " + callbackId + ": " + text);
+		logger.debug("Sending message id " + callbackId + ": " + text);
 		webSocket.sendText(text);
 	}
 	

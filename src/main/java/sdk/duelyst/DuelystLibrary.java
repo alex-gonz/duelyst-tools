@@ -5,6 +5,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.utility.ImageTrimmer;
 
 import javax.imageio.ImageIO;
@@ -32,6 +34,8 @@ public class DuelystLibrary {
 	public static Map<String, Card> cardsByName = new HashMap<String, Card>();
 	
 	public static boolean loaded = false;
+
+	private static final Logger logger = LoggerFactory.getLogger(DuelystLibrary.class);
 
 	public static void load() throws IOException {
 		load(DEFAULT_URL, null);
@@ -107,14 +111,13 @@ public class DuelystLibrary {
 			String fileName = imageUrlString.substring(imageUrlString.lastIndexOf('/') + 1);
 			File imageFile = Files.createFile(imageFolder.resolve(fileName)).toFile();
 			FileUtils.copyURLToFile(url, imageFile);
-			System.out.println("Downloaded image: " + fileName);
 
 			BufferedImage trimmed = ImageTrimmer.trimImage(imageFile);
 			ImageIO.write(trimmed, "png", imageFile);
-			System.out.println("Trimmed image: " + fileName);
+			logger.info("Downloaded and trimmed image: " + fileName);
 		} catch (FileAlreadyExistsException ignored) {
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error downloading and trimming image: {}", e);
 		}
 	}
 }

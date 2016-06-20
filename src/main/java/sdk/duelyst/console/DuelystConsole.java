@@ -3,6 +3,8 @@ package sdk.duelyst.console;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sdk.duelyst.Card;
 import sdk.duelyst.DuelystLibrary;
 import sdk.duelyst.Faction;
@@ -38,6 +40,8 @@ public class DuelystConsole {
 	private boolean retryGauntletScreenshotOnFailure;
 	private int numGauntletCardsPicked = 0;
 
+	private static final Logger logger = LoggerFactory.getLogger(DuelystConsole.class);
+
 	public static Process launchDebug(String chromePath) throws IOException, URISyntaxException {
 		return ChromeUtil.launchDebug(chromePath, URL, "duelyst-profile");
 	}
@@ -52,7 +56,7 @@ public class DuelystConsole {
 	}
 
 	private void sendMessage(DuelystMessage message) {
-		System.out.println("Sending message: " + message);
+		logger.debug("Sending message: " + message);
 		for (DuelystConsoleListener listener : listeners)
 			listener.onMessage(message);
 	}
@@ -110,14 +114,14 @@ public class DuelystConsole {
 						Optional<OcrGauntletChoices> maybeOptions = GauntletOcrUtil.getGauntletOptions(img);
 						if (maybeOptions.isPresent()) {
 							OcrGauntletChoices gauntletChoices = maybeOptions.get();
-							System.out.println("Found options: " + gauntletChoices);
+							logger.debug("Found options: " + gauntletChoices);
 							sendMessage(gauntletChoices.toGauntletOptionsMessage());
 						} else if (retryGauntletScreenshotOnFailure) {
 							// Retry on failure
-							System.out.println("Retrying screenshot because last one didn't recognize all 3 cards.");
+							logger.info("Retrying screenshot because last one didn't recognize all 3 cards.");
 							ChromeUtil.captureGauntletScreenshot(webSocket);
 						} else {
-							System.out.println("Screenshot failed, but not retrying because gauntlet was exited");
+							logger.info("Screenshot failed, but not retrying because gauntlet was exited");
 						}
 						break;
 					case CANCEL:
@@ -386,7 +390,7 @@ public class DuelystConsole {
 					});
 				} else if (message.contains("DeckLayer -\\u003E addCard")) {
 					// Added a card
-					System.out.println("Got add card:"+message);
+					logger.debug("Got add card:"+message);
 					numGauntletCardsPicked++;
 					if (numGauntletCardsPicked < NUM_CARDS_IN_FULL_GAUNTLET_DECK) {
 						retryGauntletScreenshotOnFailure = true;
@@ -536,28 +540,10 @@ public class DuelystConsole {
 							ChromeUtil.getObjectProperties(webSocket, objectId, state);
 						}
 					}
-//					TODO remove code that won't work anymore
-//					// Gauntlet picks
-//					else if (message.contains("\" \\u003E cards select\"")) {
-//						JsonObject parameter = getParameterObject(msg, 1);
-//
-//						JsonArray properties = parameter.getJsonObject("preview").getJsonArray("properties");
-//
-//						// Cards are in reverse order
-//						int option3Id = Integer.parseInt(properties.getJsonObject(0).getString("value"));
-//						int option2Id = Integer.parseInt(properties.getJsonObject(1).getString("value"));
-//						int option1Id = Integer.parseInt(properties.getJsonObject(2).getString("value"));
-//
-//						sendMessage(new GauntletOptionsMessage(
-//										DuelystLibrary.cardsById.get(option1Id),
-//										DuelystLibrary.cardsById.get(option2Id),
-//										DuelystLibrary.cardsById.get(option3Id)
-//						));
-//					}
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.toString());
 		}
 	}
 
@@ -657,8 +643,8 @@ public class DuelystConsole {
 			ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
 			image = ImageIO.read(bis);
 			bis.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error("Error converting base64 string from Chrome to an actual image: {}", e);
 		}
 		return image;
 	}

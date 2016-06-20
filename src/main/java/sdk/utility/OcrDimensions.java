@@ -1,5 +1,8 @@
 package sdk.utility;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +64,8 @@ public class OcrDimensions {
   }
 
   public static Optional<OcrDimensions> maybeFromString(String s) {
+    Logger logger = LoggerFactory.getLogger(OcrDimensions.class);
+
     String[] dimensionStrings = s.split(",");
     if (dimensionStrings.length == 8) {
       List<Integer> dimensions = Arrays.stream(dimensionStrings).map(Integer::parseInt).collect(Collectors.toList());
@@ -75,7 +80,7 @@ public class OcrDimensions {
               dimensions.get(7)
       ));
     } else {
-      System.out.println("Expected ocr dimensions in config file to have length of 8. Found incorrect one:" + s);
+      logger.error("Expected ocr dimensions in config file to have length of 8. Found incorrect one:" + s);
       return Optional.empty();
     }
   }
