@@ -128,8 +128,18 @@ public class GauntletOverlayPanel extends JPanel {
 		Collection<Rating> ratings = zeldaRatings.get(faction).get(card.id);
 
 		if (ratings != null) {
-			txtRating.setText(card.name + ": " + ratings.stream().map(rating -> rating.rating).map(Object::toString).collect(Collectors.joining(",")));
-			txtNotes.setText(ratings.stream().map(rating -> rating.notes).collect(Collectors.joining("\n")));
+			txtRating.setText(
+				card.name + ": " + ratings.stream()
+					.map(rating -> rating.rating)
+					.distinct()
+					.map(Object::toString)
+					.collect(Collectors.joining(",")));
+
+			txtNotes.setText(
+				ratings.stream()
+					.map(rating -> rating.notes)
+					.distinct()
+					.collect(Collectors.joining("\n")));
 		} else {
 			txtRating.setText("");
 			txtNotes.setText("");
