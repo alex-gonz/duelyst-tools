@@ -147,7 +147,7 @@ public class ChromeUtil {
 	private static void sendText(WebSocket webSocket, int callbackId, DuelystMessageState tag, String text) {
 		callbacks.put(callbackId, tag);
 		msgId++;
-		logger.debug("Sending message id " + callbackId + ": " + text);
+		logger.info("Sending message id " + callbackId + ": " + text);
 		webSocket.sendText(text);
 	}
 	

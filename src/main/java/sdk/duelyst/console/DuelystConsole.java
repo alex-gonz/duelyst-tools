@@ -56,7 +56,7 @@ public class DuelystConsole {
 	}
 
 	private void sendMessage(DuelystMessage message) {
-		logger.debug("Sending message: " + message);
+		logger.info("Sending message: " + message);
 		for (DuelystConsoleListener listener : listeners)
 			listener.onMessage(message);
 	}
@@ -114,7 +114,7 @@ public class DuelystConsole {
 						Optional<OcrGauntletChoices> maybeOptions = GauntletOcrUtil.getGauntletOptions(img);
 						if (maybeOptions.isPresent()) {
 							OcrGauntletChoices gauntletChoices = maybeOptions.get();
-							logger.debug("Found options: " + gauntletChoices);
+							logger.info("Found options: " + gauntletChoices);
 							sendMessage(gauntletChoices.toGauntletOptionsMessage());
 						} else if (retryGauntletScreenshotOnFailure) {
 							// Retry on failure
@@ -390,7 +390,7 @@ public class DuelystConsole {
 					});
 				} else if (message.contains("DeckLayer -\\u003E addCard")) {
 					// Added a card
-					logger.debug("Got add card:"+message);
+					logger.info("Got add card: "+ message);
 					numGauntletCardsPicked++;
 					if (numGauntletCardsPicked < NUM_CARDS_IN_FULL_GAUNTLET_DECK) {
 						retryGauntletScreenshotOnFailure = true;
@@ -543,7 +543,7 @@ public class DuelystConsole {
 				}
 			}
 		} catch (Exception e) {
-			logger.error(e.toString());
+			logger.error("Got exception handling message: " + message, e);
 		}
 	}
 

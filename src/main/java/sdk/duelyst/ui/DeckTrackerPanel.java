@@ -230,7 +230,7 @@ class PlayerPanel extends DraggablePanel {
 				imgFaction = getImage(player.generalId + "_idle.png");
 			}
 		} catch (IOException e) {
-			logger.error(e.toString());
+			logger.error("Error setting player image for generalId: " + player.generalId, e);
 		}
 
 		repaint();
@@ -320,7 +320,7 @@ class CardPanel extends DraggablePanel {
 		try {
 			imgIcon = card == null ? null : getImage(card.id + "_idle.png");
 		} catch (IOException e) {
-			logger.error(e.toString());
+			logger.error("Error getting image for card: " + card.name, e);
 		}
 		
 		repaint();

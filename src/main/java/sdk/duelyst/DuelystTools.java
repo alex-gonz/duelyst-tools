@@ -31,14 +31,14 @@ public class DuelystTools implements Runnable {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			logger.error(e.toString());
+			logger.error("Error setting up UIManager", e);
 		}
 
 		try {
 			Files.createDirectory(imageFolder);
 		} catch (FileAlreadyExistsException ignored) {
 		} catch (IOException e) {
-			logger.error(e.toString());
+			logger.error("Error creating file directory", e);
 		}
 
 		// http://stackoverflow.com/questions/20269083/make-a-swing-thread-that-show-a-please-wait-jdialog
@@ -48,7 +48,7 @@ public class DuelystTools implements Runnable {
 				try {
 					DuelystLibrary.load(imageFolder);
 				} catch (Exception e) {
-					logger.error(e.toString());
+					logger.error("Error loading card library", e);
 					JOptionPane.showMessageDialog(null, "Error loading card library: " + e.getMessage());
 					return false;
 				}
@@ -56,7 +56,7 @@ public class DuelystTools implements Runnable {
 				try {
 					ratings = GauntletDataZelda.load(DuelystLibrary.cardsById.values());
 				} catch (Exception e) {
-					logger.error(e.toString());
+					logger.error("Error loading gauntlet ratings", e);
 					JOptionPane.showMessageDialog(null, "Error loading gauntlet ratings: " + e.getMessage());
 					return false;
 				}
@@ -83,7 +83,7 @@ public class DuelystTools implements Runnable {
 		try {
 			dialog.setIconImage(getIcon());
 		} catch (IOException e) {
-			logger.error(e.toString());
+			logger.error("Error setting icon of duelyst helper", e);
 		}
 
 		JPanel panel = new JPanel(new GridLayout(2, 1, 3, 3));
@@ -103,7 +103,7 @@ public class DuelystTools implements Runnable {
 				EventQueue.invokeLater(new DuelystTools());
 			}
 		} catch (InterruptedException | ExecutionException e) {
-			logger.error(e.toString());
+			logger.error("Error instantiating Duelyst Tools", e);
 		}
 	}
 

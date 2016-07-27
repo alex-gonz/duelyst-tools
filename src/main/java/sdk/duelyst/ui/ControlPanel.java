@@ -48,6 +48,7 @@ import com.neovisionaries.ws.client.WebSocketException;
 
 public class ControlPanel extends JPanel implements ActionListener, DuelystConsoleListener {
 	private static final long serialVersionUID = -7966114779784215280L;
+	public static final String PROPERTIES_FILE_NAME = "duelyst-tools.properties";
 	private final Map<Faction, Map<Integer, Collection<Rating>>> ratings;
 
 	private Properties properties = new Properties();
@@ -175,7 +176,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 						Desktop desktop = Desktop.getDesktop();
 
 						try {
-							URI uri = new URI(GauntletDataZelda.GOOGLE_DOCS_URL_STRING);
+							URI uri = new URI(GauntletDataZelda.ZELDA_GUIDE_URL);
 							desktop.browse(uri);
 						} catch (IOException | URISyntaxException ex) {
 							logger.error(ex.toString());
@@ -229,7 +230,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		try {
 			frame.setIconImage(DuelystTools.getIcon());
 		} catch (IOException e) {
-			logger.error(e.toString());
+			logger.error("Error setting icon", e);
 		}
 
 		frame.add(this);
@@ -272,7 +273,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 		try {
 			loadProperties();
 		} catch (URISyntaxException e) {
-			logger.error(e.toString());
+			logger.error("Error loading properties file: " + PROPERTIES_FILE_NAME, e);
 		}
 	}
 
@@ -310,7 +311,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 	}
 
 	private File getPropFile() throws URISyntaxException {
-		return new File(System.getProperty("user.dir"), "duelyst-tools.properties");
+		return new File(System.getProperty("user.dir"), PROPERTIES_FILE_NAME);
 	}
 
 	private void updateEnables() {
@@ -366,7 +367,7 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 				} catch (ConnectException e) {
 					cmbTabs.removeAllItems();
 				} catch (Exception e) {
-					logger.error(e.toString());
+					logger.error("Error refreshing tabs", e);
 				}
 
 				updateEnables();
@@ -459,12 +460,12 @@ public class ControlPanel extends JPanel implements ActionListener, DuelystConso
 
 			updateEnables();
 		} catch (WebSocketException e) {
-			logger.error(e.toString());
+			logger.error("Error with websocket when connecting to chrome", e);
 			timer.cancel();
 			JOptionPane.showMessageDialog(this, "Error connecting to chrome: " + e.getMessage() + System.lineSeparator()
 							+ "Program will have to be restarted to refresh correctly.");
 		} catch (Exception e) {
-			logger.error(e.toString());
+			logger.error("Error performing action: " + action, e);
 			JOptionPane.showMessageDialog(this, "Error performing action " + action + ": " + e.getMessage());
 		}
 	}

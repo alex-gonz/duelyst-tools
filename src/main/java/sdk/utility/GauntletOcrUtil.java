@@ -49,11 +49,13 @@ public class GauntletOcrUtil {
     Rectangle thirdRectangle = getRectangle(dimensions.getX3(), dimensions, imageWidth, top);
 
     // TODO remove this once we know it works
-    File outfile = new File("subscreenshot-of-first-option.png");
+    File subscreenshotFile = new File("subscreenshot-of-first-option.png");
+    File screenshotFile = new File("screenshot-of-chrome.png");
     try {
-      ImageIO.write(img.getSubimage((int)firstRectangle.getX(), top, dimensions.getTextWidth(), dimensions.getTextHeight()), "png", outfile);
+      ImageIO.write(img.getSubimage((int)firstRectangle.getX(), top, dimensions.getTextWidth(), dimensions.getTextHeight()), "png", subscreenshotFile);
+      ImageIO.write(img, "png", screenshotFile);
     } catch (IOException e) {
-      logger.error(e.toString());
+      logger.error("Error writing screenshot image to file", e);
     }
 
     return getOcrNameToCard(img, firstRectangle).flatMap(first ->
