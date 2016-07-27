@@ -75,10 +75,7 @@ public class DuelystLibrary {
 		        		
 		        		String description = object.getString("description");
 
-								String spriteUrl = object.getString("duelyst_sprite");
-								String counterplayName = spriteUrl.substring(spriteUrl.lastIndexOf('/') + 1, spriteUrl.lastIndexOf('.'));
-
-		        		Card card = new Card(id, name, type, faction, rarity, manaCost, attack, health, description, counterplayName);
+		        		Card card = new Card(id, name, type, faction, rarity, manaCost, attack, health, description);
 		        		
 		        		// Duplicates in there for some reason
 		        		if (!cardsByName.containsKey(name.toUpperCase())) {

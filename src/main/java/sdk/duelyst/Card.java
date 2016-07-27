@@ -14,10 +14,7 @@ public class Card {
 
 	public String description;
 
-	// the counterplay image file that's downloaded for this card. Needed to recognize images in gauntlet
-	public String counterplayName;
-	
-	public Card(int id, String name, CardType type, Faction faction, Rarity rarity, int manaCost, int attack, int health, String description, String counterplayName) {
+	public Card(int id, String name, CardType type, Faction faction, Rarity rarity, int manaCost, int attack, int health, String description) {
 		this.id = id;
 		
 		this.name = name;
@@ -30,8 +27,6 @@ public class Card {
 		this.health = health;
 		
 		this.description = description;
-
-		this.counterplayName = counterplayName;
 	}
 
 	public boolean isMinion() {
